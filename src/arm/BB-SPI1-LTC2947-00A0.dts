@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2013 CircuitCo
+ * Copyright (C) 2020 Otter Works
  *
- * Virtual cape for SPI1 on connector pins P9.29 P9.31 P9.30 P9.28
+ * LTC2947 on SPI1
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -24,7 +24,7 @@
 
 			chosen {
 				overlays {
-					BB-SPIDEV1-00A0 = __TIMESTAMP__;
+					BB-SPI1-LTC2947-00A0 = __TIMESTAMP__;
 				};
 			};
 		};
@@ -37,6 +37,7 @@
 		target = <&ocp>;
 		__overlay__ {
 			P9_28_pinmux { status = "disabled"; };	/* spi1_cs0 */
+			P9_42_pinmux { status = "disabled"; };	/* spi1_cs1 */
 			P9_30_pinmux { status = "disabled"; };	/* spi1_d1 */
 			P9_29_pinmux { status = "disabled"; };	/* spi1_d0 */
 			P9_31_pinmux { status = "disabled"; };	/* spi1_sclk */
@@ -53,7 +54,7 @@
 					0x194 0x33	/* mcasp0_fsx.spi1_d0, INPUT_PULLUP | MODE3 */
 					0x198 0x13	/* mcasp0_axr0.spi1_d1, OUTPUT_PULLUP | MODE3 */
 					0x19c 0x13	/* mcasp0_ahclkr.spi1_cs0, OUTPUT_PULLUP | MODE3 */
-					// 0x164 0x12	/* eCAP0_in_PWM0_out.spi1_cs1 OUTPUT_PULLUP | MODE2 */
+					0x164 0x12	/* eCAP0_in_PWM0_out.spi1_cs1 OUTPUT_PULLUP | MODE2 */
 				>;
 			};
 		};
@@ -68,35 +69,25 @@
 			status = "okay";
 			pinctrl-names = "default";
 			pinctrl-0 = <&bb_spi1_pins>;
+			ti,pio-mode; /* disable dma when used as an overlay, dma gets stuck at 160 bits... */
 
-			/*
-			 * Select the D0 pin as output and D1 as
-			 * input. The default is D0 as input and
-			 * D1 as output.
-			 */
-			//ti,pindir-d0-out-d1-in;
-
-			channel@0 {
+			ltc2947_spi1_0: ltc2947@0 {
 				#address-cells = <1>;
 				#size-cells = <0>;
 
-				compatible = "spidev";
-				symlink = "spi/1.0";
+				compatible = "adi,ltc2947";
 
 				reg = <0>;
-				spi-max-frequency = <16000000>;
-				spi-cpha;
+				spi-max-frequency = <1000000>;
 			};
-
-			channel@1 {
+			ltc2947_spi1_1: ltc2947@1 {
 				#address-cells = <1>;
 				#size-cells = <0>;
 
-				compatible = "spidev";
-				symlink = "spi/1.1";
+				compatible = "adi,ltc2947";
 
 				reg = <1>;
-				spi-max-frequency = <16000000>;
+				spi-max-frequency = <1000000>;
 			};
 		};
 	};

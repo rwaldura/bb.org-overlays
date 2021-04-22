@@ -12,44 +12,6 @@
 #include <dt-bindings/interrupt-controller/irq.h>
 
 / {
-	compatible = "ti,beaglebone", "ti,beaglebone-black";
-
-	/* identification */
-	part-number = "BB-BONE-WL1835MOD";
-	version = "00A0";
-
-	/* state the resources this cape uses */
-	exclusive-use =
-		/* the pin header uses */
-		"P8.21",	/* GPIO1_30 (MMC2) */
-		"P8.20",	/* GPIO1_31 (MMC2) */
-		"P8.25",	/* GPIO1_0 (MMC2) */
-		"P8.24",	/* GPIO1_1 (MMC2) */
-		"P8.05",	/* GPIO1_2 (MMC2) */
-		"P8.06",	/* GPIO1_3 (MMC2) */
-
-		"P8.35",	/* UART4_RTS */
-		"P8.33",	/* UART4_CTS */
-		"P9.11",	/* UART4_RXD */
-		"P9.13",	/* UART4_TXD */
-
-		"P9.19",	/* I2C2_SCL */
-		"P9.20",	/* I2C2_SDA */
-
-		"P9.41",	/* CLKOUT2 */
-
-		"gpio1_12", /* BT_EN */
-		"gpio0_26",	/* WL_EN */
-		"gpio0_27",	/* WL_IRQ */
-		"gpio1_29",	/* BF_EN */
-		"gpio1_15",	/* reserved */
-		"gpio1_5",	/* reserved */
-
-		/* the hardware ip uses */
-		"uart4",
-		"mmc2",
-		"i2c2";
-
 	/*
 	 * Helper to show loaded overlays under: /proc/device-tree/chosen/overlays/
 	 */
@@ -109,18 +71,6 @@
 				/* WL_EN */
 				gpio = <&gpio0 26 0>;
 				enable-active-high;
-			};
-
-			kim {
-			        compatible = "kim";
-			        nshutdown_gpio = <44>; /* Bank1, pin12 */
-			        dev_name = "/dev/ttyO4";
-			        flow_cntrl = <1>;
-			        baud_rate = <3000000>;
-			};
-
-			btwilink {
-			        compatible = "btwilink";
 			};
 		};
 	};
@@ -223,9 +173,14 @@
 		target = <&uart4>;
 		__overlay__ {
 			pinctrl-names = "default", "sleep";
-			pinctrl-0 = <&uart4_pins_default>;
-			pinctrl-1 = <&uart4_pins_sleep>;
+			pinctrl-0 = <&uart4_pins_default &bt_pins>;
+			pinctrl-1 = <&uart4_pins_sleep &bt_pins>;
 			status = "okay";
+
+			bluetooth {
+				compatible = "ti,wl1835-st";
+				enable-gpios = <&gpio1 12 GPIO_ACTIVE_HIGH>;
+			};
 		};
 	};
 };

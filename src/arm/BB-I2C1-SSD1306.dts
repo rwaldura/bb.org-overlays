@@ -1,7 +1,8 @@
 /*
- * Copyright (C) 2013 CircuitCo
+ * Copyright (C) 2021 Thales Silva <thales.tas@gmail.com>
  *
- * Virtual cape for I2C1 on connector pins P9.17 P9.18
+ * SSD1306 cape using
+ * I2C1 on connector pin P9.17 P9.19
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -24,7 +25,7 @@
 
 			chosen {
 				overlays {
-					BB-I2C1-00A0 = __TIMESTAMP__;
+					BB-I2C1-SSD1306 = __TIMESTAMP__;
 				};
 			};
 		};
@@ -61,21 +62,19 @@
 			pinctrl-0 = <&bb_i2c1_pins>;
 
 			/* this is the configuration part */
-			clock-frequency = <100000>;
+			clock-frequency = <400000>;
 
 			#address-cells = <1>;
 			#size-cells = <0>;
 
-			/* add any i2c devices on the bus here */
-
-			// commented out example of a touchscreen (taken from BB-BONE-LCD7-01-00A4) */
-			// maxtouch@4a {
-			//	compatible = "mXT224";
-			//	reg = <0x4a>;
-			//	interrupt-parent = <&gpio4>;
-			//	interrupts = <19 0x0>;
-			//	atmel,irq-gpio = <&gpio4 19 0>;
-			// };
+			ssd1306: oled@3c {
+				compatible = "solomon,ssd1306fb-i2c";
+				reg = <0x3c>;
+				solomon,width = <128>;
+				solomon,height = <64>;
+				solomon,com-invdir;
+				solomon,page-offset = <0>;
+			};
 		};
 	};
 };
